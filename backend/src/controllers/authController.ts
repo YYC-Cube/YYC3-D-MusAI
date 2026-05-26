@@ -1,10 +1,23 @@
 import { Request, Response } from 'express'
 import Joi from 'joi'
 import { Op } from 'sequelize'
+import { NODE_ENV } from '../config'
 import { User } from '../models'
-import { generateToken } from '../middleware/auth'
-import { generateTokenPair, verifyRefreshToken, refreshAccessToken } from '../utils/tokenManager'
 import logger from '../utils/logger'
+import { generateTokenPair, refreshAccessToken, verifyRefreshToken } from '../utils/tokenManager'
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: NODE_ENV === 'production',
+  sameSite: NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  path: '/',
+}
+
+const REFRESH_COOKIE_OPTIONS = {
+  ...COOKIE_OPTIONS,
+  maxAge: 30 * 24 * 60 * 60 * 1000,
+}
 
 // 验证规则
 const registerSchema = Joi.object({
@@ -69,6 +82,9 @@ export async function register(req: Request, res: Response): Promise<void> {
 
     // 生成双令牌
     const tokenPair = generateTokenPair(user)
+
+    res.cookie('access_token', tokenPair.accessToken, COOKIE_OPTIONS)
+    res.cookie('refresh_token', tokenPair.refreshToken, REFRESH_COOKIE_OPTIONS)
 
     // 返回用户信息（不含密码）
     res.status(201).json({
@@ -161,6 +177,9 @@ export async function login(req: Request, res: Response): Promise<void> {
 
     // 生成双令牌
     const tokenPair = generateTokenPair(user)
+
+    res.cookie('access_token', tokenPair.accessToken, COOKIE_OPTIONS)
+    res.cookie('refresh_token', tokenPair.refreshToken, REFRESH_COOKIE_OPTIONS)
 
     res.json({
       success: true,

@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express, { Express, NextFunction, Request, Response } from 'express'
 import rateLimit from 'express-rate-limit'
@@ -8,7 +9,6 @@ import { Server as SocketIOServer } from 'socket.io'
 import { FRONTEND_URL, NODE_ENV, PORT, UPLOAD_DIR } from './config'
 import ChatService from './services/chatService'
 import logger from './utils/logger'
-import redis from './utils/redis'
 
 // 导入路由
 import authRoutes from './routes/authRoutes'
@@ -23,6 +23,7 @@ app.use(cors({
   origin: FRONTEND_URL,
   credentials: true,
 }))
+app.use(cookieParser())
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 

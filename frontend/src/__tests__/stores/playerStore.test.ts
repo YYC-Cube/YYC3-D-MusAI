@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { usePlayerStore } from '@/stores/playerStore'
 import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('howler', () => ({
   Howl: vi.fn().mockImplementation(() => ({
@@ -34,8 +34,6 @@ const mockTrack2 = {
 
 describe('usePlayerStore', () => {
   beforeEach(() => {
-    const { howl } = usePlayerStore.getState()
-    if (howl) howl.unload()
     usePlayerStore.setState({
       currentTrack: null,
       isPlaying: false,
@@ -44,7 +42,6 @@ describe('usePlayerStore', () => {
       duration: 0,
       queue: [],
       currentIndex: -1,
-      howl: null,
     })
   })
 
@@ -256,7 +253,6 @@ describe('usePlayerStore', () => {
 
     expect(result.current.currentTrack).toEqual(noAudioTrack)
     expect(result.current.isPlaying).toBe(false)
-    expect(result.current.howl).toBeNull()
   })
 
   it('should toggle play state', () => {

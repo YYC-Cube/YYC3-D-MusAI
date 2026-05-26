@@ -39,8 +39,15 @@ export function verifyToken(token: string): JwtPayload | null {
 export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
   try {
     const authHeader = req.headers.authorization
+    let token: string | undefined
 
-    if (!authHeader?.startsWith('Bearer ')) {
+    if (authHeader?.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1]
+    } else if (req.cookies?.access_token) {
+      token = req.cookies.access_token
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         error: {
@@ -50,7 +57,6 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
       })
     }
 
-    const token = authHeader.split(' ')[1]
     const decoded = verifyToken(token)
 
     if (!decoded) {
