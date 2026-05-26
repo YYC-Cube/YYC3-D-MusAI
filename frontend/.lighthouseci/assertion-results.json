@@ -1,0 +1,17 @@
+[
+  {
+    "name": "maxNumericValue",
+    "expected": 4000,
+    "actual": 113342.09599999999,
+    "values": [
+      113342.09599999999
+    ],
+    "operator": "<=",
+    "passed": false,
+    "auditId": "largest-contentful-paint",
+    "level": "warn",
+    "url": "http://localhost:20101/",
+    "auditTitle": "Largest Contentful Paint",
+    "auditDocumentationLink": "https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/"
+  }
+]

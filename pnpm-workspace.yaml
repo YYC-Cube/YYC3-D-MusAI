@@ -1,0 +1,5 @@
+packages:
+  - frontend
+  - backend
+  - mobile-app
+  - shared

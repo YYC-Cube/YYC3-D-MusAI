@@ -1,0 +1,11 @@
+{
+  "name": "@dmusic/shared",
+  "version": "1.0.0",
+  "description": "D-Music 前后端共享类型定义",
+  "main": "index.ts",
+  "types": "index.ts",
+  "private": true,
+  "exports": {
+    "./types/*": "./types/*"
+  }
+}

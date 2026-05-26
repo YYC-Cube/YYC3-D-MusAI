@@ -1,0 +1,15 @@
+export const usePlayerStore = () => ({
+  currentTrack: null,
+  isPlaying: false,
+  shuffleMode: false,
+  repeatMode: 'off',
+  queue: [],
+  setCurrentSong: jest.fn(),
+  addToQueue: jest.fn(),
+  play: jest.fn(),
+  pause: jest.fn(),
+  toggleShuffle: jest.fn(),
+  toggleRepeat: jest.fn(),
+  next: jest.fn(),
+  previous: jest.fn(),
+});

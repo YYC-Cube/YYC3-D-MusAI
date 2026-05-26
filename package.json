@@ -1,0 +1,25 @@
+{
+  "name": "musai",
+  "version": "1.0.0",
+  "description": "MusAI 缪斯智音 - AI驱动的新一代智能音乐平台",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:frontend": "pnpm --filter musai-frontend dev",
+    "dev:backend": "pnpm --filter musai-backend dev",
+    "build:frontend": "pnpm --filter musai-frontend build",
+    "build:backend": "pnpm --filter musai-backend build",
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check",
+    "test": "pnpm -r test",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "pnpm": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
