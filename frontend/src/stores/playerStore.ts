@@ -129,7 +129,13 @@ export const usePlayerStore = create<PlayerState>()(
                 set({ duration: Math.floor(dur) })
               }
             },
-            onloaderror: () => {
+            onloaderror: (_id, error) => {
+              console.error('[MusAI Player] Audio load error:', error)
+              set({ isPlaying: false, progress: 0 })
+              stopProgressTracking()
+            },
+            onplayerror: (_id, error) => {
+              console.error('[MusAI Player] Audio play error:', error)
               set({ isPlaying: false })
               stopProgressTracking()
             },
