@@ -52,11 +52,12 @@ function HomePage() {
         {quickActions.map((action, i) => (
           <Card
             key={action.label}
-            className={`musai-press musai-hover-lift overflow-hidden border-0 bg-gradient-to-br ${action.color} text-white animate-musai-slide-up stagger-${i + 1}`}
+            className={`musai-press musai-card-interactive musai-glass overflow-hidden animate-musai-slide-up stagger-${i + 1}`}
           >
-            <CardContent className="flex flex-col items-center justify-center p-5">
-              <action.icon className="h-6 w-6 mb-2 opacity-90" />
-              <span className="font-medium text-sm">{action.label}</span>
+            <CardContent className="flex flex-col items-center justify-center p-5 relative">
+              <div className={`absolute inset-0 bg-gradient-to-br ${action.color} opacity-10 rounded-inherit`} />
+              <action.icon className="h-6 w-6 mb-2 text-primary musai-icon-glow relative z-10" />
+              <span className="font-medium text-sm relative z-10">{action.label}</span>
             </CardContent>
           </Card>
         ))}
@@ -73,7 +74,7 @@ function HomePage() {
           {mockPlaylists.map((playlist, i) => (
             <Card
               key={playlist.id}
-              className={`musai-press musai-hover-lift overflow-hidden border-0 bg-card shadow-sm animate-musai-slide-up stagger-${i + 1}`}
+              className={`musai-card-interactive overflow-hidden bg-card shadow-sm animate-musai-slide-up stagger-${i + 1}`}
             >
               <div className="musai-cover aspect-square relative group">
                 {playlist.cover ? (
@@ -117,18 +118,19 @@ function HomePage() {
             <div
               key={track.id}
               className={`musai-press flex items-center gap-4 p-3 rounded-xl transition-colors cursor-pointer group ${playingId === track.id
-                  ? 'bg-primary/10'
-                  : 'hover:bg-muted/60'
+                ? 'bg-primary/10'
+                : 'hover:bg-muted/60'
                 }`}
               onClick={() => handleTrackSelect(track)}
             >
               <span className={`w-6 text-center text-sm font-medium ${playingId === track.id ? 'text-primary' : 'text-muted-foreground'
                 }`}>
                 {playingId === track.id ? (
-                  <div className="flex items-end justify-center gap-[3px] h-4">
-                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
-                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
-                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                  <div className="musai-playing-indicator">
+                    <div className="musai-playing-bar" />
+                    <div className="musai-playing-bar" />
+                    <div className="musai-playing-bar" />
+                    <div className="musai-playing-bar" />
                   </div>
                 ) : (
                   index + 1

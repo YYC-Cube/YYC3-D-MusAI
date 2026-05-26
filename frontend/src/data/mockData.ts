@@ -41,7 +41,7 @@ export const mockTracks: Track[] = [
     artist: '董小姐 & 沫言',
     album: '岁月如歌',
     cover: coverImages[1],
-    audioUrl: `${MUSIC}/董小姐 & 沫言 - 岁月如歌.mp3`,
+    audioUrl: `${MUSIC}/董小姐 %26 沫言 - 岁月如歌.mp3`,
     duration: 256,
   },
   {
