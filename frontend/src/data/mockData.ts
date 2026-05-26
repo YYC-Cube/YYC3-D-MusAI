@@ -50,7 +50,7 @@ export const mockTracks: Track[] = [
     artist: '董小姐 & 沫言',
     album: '时光',
     cover: coverImages[2],
-    audioUrl: `${MUSIC}/董小姐 & 沫言 - 时光.mp3`,
+    audioUrl: `${MUSIC}/董小姐 %26 沫言 - 时光.mp3`,
     duration: 218,
   },
   {
@@ -59,7 +59,7 @@ export const mockTracks: Track[] = [
     artist: '董小姐 & 沫言',
     album: '浮生如渡',
     cover: coverImages[3],
-    audioUrl: `${MUSIC}/董小姐 & 沫言 - 浮生如渡.mp3`,
+    audioUrl: `${MUSIC}/董小姐 %26 沫言 - 浮生如渡.mp3`,
     duration: 242,
   },
   {
