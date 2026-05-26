@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
@@ -136,6 +138,11 @@ body {
   50% {
     height: 16px;
   }
+}
+
+@keyframes musai-bar-bounce {
+  0% { height: 4px; }
+  100% { height: 18px; }
 }
 
 @keyframes musai-spin-slow {

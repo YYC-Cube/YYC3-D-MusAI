@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { Howl } from 'howler'
 
 interface Track {
   id: string
@@ -21,7 +20,6 @@ interface PlayerState {
   duration: number
   queue: Track[]
   currentIndex: number
-  howl: Howl | null
 
   actions: {
     play: (track: Track) => void
@@ -39,19 +37,34 @@ interface PlayerState {
   }
 }
 
+let audioEl: HTMLAudioElement | null = null
 let progressTimer: ReturnType<typeof setInterval> | null = null
+let isSwitchingTrack = false
 
-function startProgressTracking(get: () => PlayerState) {
+function createAudio(): HTMLAudioElement {
+  if (audioEl) {
+    audioEl.pause()
+    audioEl.removeAttribute('src')
+    audioEl.load()
+  }
+  audioEl = new Audio()
+  audioEl.preload = 'auto'
+  return audioEl
+}
+
+function startProgressTracking() {
   stopProgressTracking()
   progressTimer = setInterval(() => {
-    const state = get()
-    if (!state.isPlaying || !state.howl) return
-    const seek = state.howl.seek() as number
-    const dur = state.howl.duration() as number
-    if (typeof seek === 'number' && typeof dur === 'number' && dur > 0) {
-      state.actions.setProgress(Math.floor(seek))
+    if (!audioEl || audioEl.paused) return
+    const seek = audioEl.currentTime
+    const dur = audioEl.duration
+    if (isFinite(seek) && isFinite(dur) && dur > 0) {
+      usePlayerStore.setState({
+        progress: Math.floor(seek),
+        duration: Math.floor(dur),
+      })
     }
-  }, 1000)
+  }, 500)
 }
 
 function stopProgressTracking() {
@@ -59,6 +72,18 @@ function stopProgressTracking() {
     clearInterval(progressTimer)
     progressTimer = null
   }
+}
+
+function playNextInQueue() {
+  const { queue, currentIndex } = usePlayerStore.getState()
+  if (queue.length === 0) return
+  const nextIndex = currentIndex < queue.length - 1 ? currentIndex + 1 : 0
+  usePlayerStore.setState({
+    currentIndex: nextIndex,
+    currentTrack: queue[nextIndex],
+    progress: 0,
+  })
+  usePlayerStore.getState().actions.play(queue[nextIndex])
 }
 
 export const usePlayerStore = create<PlayerState>()(
@@ -71,14 +96,11 @@ export const usePlayerStore = create<PlayerState>()(
       duration: 0,
       queue: [],
       currentIndex: -1,
-      howl: null,
 
       actions: {
         play: (track) => {
-          const { howl } = get()
-          if (howl) {
-            howl.unload()
-          }
+          if (isSwitchingTrack) return
+          isSwitchingTrack = true
 
           if (!track.audioUrl) {
             set({
@@ -86,69 +108,62 @@ export const usePlayerStore = create<PlayerState>()(
               isPlaying: false,
               progress: 0,
               duration: track.duration || 0,
-              howl: null,
             })
             stopProgressTracking()
+            isSwitchingTrack = false
             return
           }
 
-          const newHowl = new Howl({
-            src: [track.audioUrl],
-            html5: true,
-            volume: get().volume,
-            onplay: () => {
-              set({ isPlaying: true })
-              startProgressTracking(get)
-            },
-            onpause: () => {
-              set({ isPlaying: false })
-              stopProgressTracking()
-            },
-            onstop: () => {
-              set({ isPlaying: false })
-              stopProgressTracking()
-            },
-            onend: () => {
-              set({ isPlaying: false, progress: 0 })
-              stopProgressTracking()
-              const { queue, currentIndex } = get()
-              if (queue.length > 0) {
-                const nextIndex = currentIndex < queue.length - 1 ? currentIndex + 1 : 0
-                set({
-                  currentIndex: nextIndex,
-                  currentTrack: queue[nextIndex],
-                  isPlaying: true,
-                  progress: 0,
-                })
-                get().actions.play(queue[nextIndex])
-              }
-            },
-            onload: () => {
-              const dur = newHowl.duration() as number
-              if (typeof dur === 'number' && dur > 0) {
-                set({ duration: Math.floor(dur) })
-              }
-            },
-            onloaderror: (_id, error) => {
-              console.error('[MusAI Player] Audio load error:', error)
-              set({ isPlaying: false, progress: 0 })
-              stopProgressTracking()
-            },
-            onplayerror: (_id, error) => {
-              console.error('[MusAI Player] Audio play error:', error)
-              set({ isPlaying: false })
-              stopProgressTracking()
-            },
-          })
+          const audio = createAudio()
+          const url = encodeURI(track.audioUrl)
 
-          newHowl.play()
+          audio.volume = get().volume
+
+          audio.oncanplay = () => {
+            if (isFinite(audio.duration) && audio.duration > 0) {
+              set({ duration: Math.floor(audio.duration) })
+            }
+          }
+
+          audio.onplay = () => {
+            set({ isPlaying: true })
+            startProgressTracking()
+          }
+
+          audio.onpause = () => {
+            if (!isSwitchingTrack) {
+              set({ isPlaying: false })
+              stopProgressTracking()
+            }
+          }
+
+          audio.onended = () => {
+            stopProgressTracking()
+            isSwitchingTrack = false
+            playNextInQueue()
+          }
+
+          audio.onerror = () => {
+            console.error('[MusAI Player] Audio error:', audio.error?.code, audio.error?.message)
+            set({ isPlaying: false, progress: 0 })
+            stopProgressTracking()
+            isSwitchingTrack = false
+          }
+
+          audio.src = url
+
+          audio.play().catch((err) => {
+            console.warn('[MusAI Player] play() rejected:', err)
+            set({ isPlaying: false })
+            isSwitchingTrack = false
+          }).finally(() => {
+            isSwitchingTrack = false
+          })
 
           set({
             currentTrack: track,
-            isPlaying: true,
             progress: 0,
             duration: track.duration || 0,
-            howl: newHowl,
           })
 
           const { queue } = get()
@@ -159,31 +174,27 @@ export const usePlayerStore = create<PlayerState>()(
         },
 
         pause: () => {
-          const { howl } = get()
-          if (howl) howl.pause()
+          if (audioEl) audioEl.pause()
           set({ isPlaying: false })
           stopProgressTracking()
         },
 
         resume: () => {
-          const { howl } = get()
-          if (howl) {
-            howl.play()
-          } else {
-            set({ isPlaying: true })
+          if (audioEl) {
+            audioEl.play().catch(() => { })
           }
         },
 
         togglePlay: () => {
-          const { isPlaying, howl, currentTrack } = get()
+          const { isPlaying, currentTrack } = get()
           if (!currentTrack) return
           if (isPlaying) {
-            if (howl) howl.pause()
+            if (audioEl) audioEl.pause()
             set({ isPlaying: false })
             stopProgressTracking()
           } else {
-            if (howl) {
-              howl.play()
+            if (audioEl && audioEl.src) {
+              audioEl.play().catch(() => { })
             } else {
               get().actions.play(currentTrack)
             }
@@ -192,15 +203,13 @@ export const usePlayerStore = create<PlayerState>()(
 
         setVolume: (volume) => {
           const clamped = Math.max(0, Math.min(1, volume))
-          const { howl } = get()
-          if (howl) howl.volume(clamped)
+          if (audioEl) audioEl.volume = clamped
           set({ volume: clamped })
         },
 
         setProgress: (progress) => {
-          const { howl } = get()
-          if (howl && howl.playing()) {
-            howl.seek(progress)
+          if (audioEl && !audioEl.paused) {
+            audioEl.currentTime = progress
           }
           set({ progress: Math.max(0, progress) })
         },
@@ -224,15 +233,21 @@ export const usePlayerStore = create<PlayerState>()(
         },
 
         setQueue: (tracks) => {
-          const { howl } = get()
-          if (howl) howl.unload()
-          stopProgressTracking()
+          const { currentTrack, isPlaying } = get()
+          const stillInQueue = currentTrack && tracks.some(t => t.id === currentTrack.id)
+          if (!stillInQueue) {
+            if (audioEl) {
+              audioEl.pause()
+              audioEl.removeAttribute('src')
+              audioEl.load()
+            }
+            stopProgressTracking()
+          }
           set({
             queue: tracks,
             currentIndex: tracks.length > 0 ? 0 : -1,
-            howl: null,
-            isPlaying: false,
-            progress: 0,
+            isPlaying: stillInQueue ? isPlaying : false,
+            progress: stillInQueue ? get().progress : 0,
           })
         },
 
@@ -242,11 +257,15 @@ export const usePlayerStore = create<PlayerState>()(
         },
 
         removeFromQueue: (id) => {
-          const { queue, currentIndex, currentTrack, howl } = get()
+          const { queue, currentIndex, currentTrack } = get()
           const newQueue = queue.filter((t) => t.id !== id)
 
           if (currentTrack?.id === id) {
-            if (howl) howl.unload()
+            if (audioEl) {
+              audioEl.pause()
+              audioEl.removeAttribute('src')
+              audioEl.load()
+            }
             stopProgressTracking()
             const nextIndex = Math.min(currentIndex, newQueue.length - 1)
             set({
@@ -255,7 +274,6 @@ export const usePlayerStore = create<PlayerState>()(
               currentTrack: newQueue[nextIndex] || null,
               isPlaying: false,
               progress: 0,
-              howl: null,
             })
           } else {
             set({
@@ -266,8 +284,11 @@ export const usePlayerStore = create<PlayerState>()(
         },
 
         clearQueue: () => {
-          const { howl } = get()
-          if (howl) howl.unload()
+          if (audioEl) {
+            audioEl.pause()
+            audioEl.removeAttribute('src')
+            audioEl.load()
+          }
           stopProgressTracking()
           set({
             queue: [],
@@ -275,7 +296,6 @@ export const usePlayerStore = create<PlayerState>()(
             currentTrack: null,
             isPlaying: false,
             progress: 0,
-            howl: null,
           })
         },
       },
@@ -284,8 +304,6 @@ export const usePlayerStore = create<PlayerState>()(
       name: 'player-storage',
       partialize: (state) => ({
         volume: state.volume,
-        queue: state.queue,
-        currentIndex: state.currentIndex,
       }),
     }
   )

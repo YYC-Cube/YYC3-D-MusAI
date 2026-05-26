@@ -8,14 +8,13 @@ const PRECACHE_URLS = [
   '/login',
   '/register',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
+  '/DXJ-02.png',
 ]
 
 // 安装事件 - 预缓存关键资源
 self.addEventListener('install', (event) => {
   console.log('[ServiceWorker] 安装')
-  
+
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then((cache) => {
@@ -29,13 +28,13 @@ self.addEventListener('install', (event) => {
 // 激活事件 - 清理旧缓存
 self.addEventListener('activate', (event) => {
   console.log('[ServiceWorker] 激活')
-  
+
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
         return Promise.all(
           cacheNames
-            .filter((name) => 
+            .filter((name) =>
               name !== STATIC_CACHE && name !== DYNAMIC_CACHE
             )
             .map((name) => caches.delete(name))
@@ -52,6 +51,18 @@ self.addEventListener('fetch', (event) => {
 
   // 只处理GET请求
   if (request.method !== 'GET') return
+
+  // Range请求(音频seek) - 直接走网络，不缓存(206 Partial Response不支持Cache API)
+  if (request.headers.has('range')) return
+
+  // 音频文件 - 网络优先，不缓存(避免206 Partial Response错误)
+  if (url.pathname.match(/\.(mp3|wav|ogg|flac|aac|m4a|weba)$/i)) {
+    event.respondWith(
+      fetch(request)
+        .catch(() => caches.match(request))
+    )
+    return
+  }
 
   // API请求 - 网络优先策略
   if (url.pathname.startsWith('/api/')) {
@@ -75,7 +86,7 @@ self.addEventListener('fetch', (event) => {
 
   // 静态资源 - 缓存优先策略
   if (
-    url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?)$/i)
+    url.pathname.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff2?|webp)$/i)
   ) {
     event.respondWith(
       caches.match(request)

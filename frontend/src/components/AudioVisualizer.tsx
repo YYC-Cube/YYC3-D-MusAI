@@ -39,21 +39,23 @@ export default function AudioVisualizer({
         analyserRef.current = audioContext.createAnalyser()
         analyserRef.current.fftSize = 256
         analyserRef.current.smoothingTimeConstant = 0.8
+        analyserRef.current.connect(audioContext.destination)
       }
 
       const analyser = analyserRef.current
 
-      if (!sourceRef.current && audio) {
-        sourceRef.current = audioContext.createMediaElementSource(audio)
-        sourceRef.current.connect(analyser)
-        analyser.connect(audioContext.destination)
+      if (sourceRef.current) {
+        try { sourceRef.current.disconnect() } catch {}
+        sourceRef.current = null
       }
+      sourceRef.current = audioContext.createMediaElementSource(audio)
+      sourceRef.current.connect(analyser)
 
       const bufferLength = analyser.frequencyBinCount
       dataArrayRef.current = new Uint8Array(bufferLength)
 
     } catch (error) {
-      console.error('初始化音频分析器失败:', error)
+      console.error('AudioVisualizer init error:', error)
     }
   }, [])
 

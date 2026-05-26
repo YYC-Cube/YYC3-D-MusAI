@@ -47,8 +47,8 @@ function DiscoverPage() {
   }, [searchQuery, selectedGenre, sortBy])
 
   const handlePlay = (track: Track) => {
-    actions.play(track)
     actions.setQueue(filteredTracks)
+    actions.play(track)
   }
 
   return (
