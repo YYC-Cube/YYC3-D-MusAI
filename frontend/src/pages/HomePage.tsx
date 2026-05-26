@@ -1,17 +1,20 @@
-import { useState } from 'react'
-import type { Track } from '@/types/music'
 import { CoverFlow } from '@/components/CoverFlow/CoverFlow'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { mockPlaylists, mockTracks } from '@/data/mockData'
 import { usePlayerStore } from '@/stores/playerStore'
-import { mockTracks, mockPlaylists } from '@/data/mockData'
+import type { Track } from '@/types/music'
+import { Heart, Mic2, Music, Play, Shuffle, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 
 function HomePage() {
   const [selectedTrack, setSelectedTrack] = useState<Track | null>(null)
+  const [playingId, setPlayingId] = useState<string | null>(null)
   const { actions } = usePlayerStore()
 
   const handleTrackSelect = (track: Track) => {
     setSelectedTrack(track)
+    setPlayingId(track.id)
     actions.play(track)
   }
 
@@ -19,19 +22,24 @@ function HomePage() {
     return track.cover || null
   }
 
+  const quickActions = [
+    { icon: Shuffle, label: '随机播放', color: 'from-purple-500 to-indigo-600' },
+    { icon: Heart, label: '我喜欢', color: 'from-rose-500 to-pink-600' },
+    { icon: TrendingUp, label: '排行榜', color: 'from-amber-500 to-orange-600' },
+    { icon: Mic2, label: '歌手', color: 'from-emerald-500 to-teal-600' },
+  ]
+
   return (
-    <div className="space-y-8">
-      {/* Hero Section - CoverFlow */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8">
-        <div className="mb-6">
+    <div className="space-y-10 pb-4">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 sm:p-8">
+        <div className="mb-6 animate-musai-fade-in">
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
             发现音乐
           </h1>
-          <p className="mt-2 text-muted-foreground">
-            探索无限可能，让音乐点亮生活
+          <p className="mt-2 text-muted-foreground text-base">
+            探索无限可能，让音乐点亮生活 🎵
           </p>
         </div>
-        
         <CoverFlow
           tracks={mockTracks}
           onTrackSelect={handleTrackSelect}
@@ -40,96 +48,108 @@ function HomePage() {
         />
       </section>
 
-      {/* Quick Actions */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Card className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <span className="text-3xl mb-2">🎵</span>
-            <span className="font-medium">随机播放</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <span className="text-3xl mb-2">❤️</span>
-            <span className="font-medium">我喜欢</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <span className="text-3xl mb-2">📊</span>
-            <span className="font-medium">排行榜</span>
-          </CardContent>
-        </Card>
-        
-        <Card className="cursor-pointer transition-all hover:scale-105 hover:shadow-lg">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <span className="text-3xl mb-2">🎤</span>
-            <span className="font-medium">歌手</span>
-          </CardContent>
-        </Card>
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {quickActions.map((action, i) => (
+          <Card
+            key={action.label}
+            className={`musai-press musai-hover-lift overflow-hidden border-0 bg-gradient-to-br ${action.color} text-white animate-musai-slide-up stagger-${i + 1}`}
+          >
+            <CardContent className="flex flex-col items-center justify-center p-5">
+              <action.icon className="h-6 w-6 mb-2 opacity-90" />
+              <span className="font-medium text-sm">{action.label}</span>
+            </CardContent>
+          </Card>
+        ))}
       </section>
 
-      {/* Recommended Playlists */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">推荐歌单</h2>
-          <Button variant="ghost" size="sm">查看全部</Button>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-2xl font-bold tracking-tight">推荐歌单</h2>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            查看全部
+          </Button>
         </div>
-        
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          {mockPlaylists.map((playlist) => (
-            <Card key={playlist.id} className="overflow-hidden transition-all hover:shadow-lg">
-              <div className="aspect-square bg-muted relative">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+          {mockPlaylists.map((playlist, i) => (
+            <Card
+              key={playlist.id}
+              className={`musai-press musai-hover-lift overflow-hidden border-0 bg-card shadow-sm animate-musai-slide-up stagger-${i + 1}`}
+            >
+              <div className="musai-cover aspect-square relative group">
                 {playlist.cover ? (
                   <img
                     src={playlist.cover}
                     alt={playlist.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-4xl">
-                    🎵
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <Music className="h-8 w-8 text-muted-foreground" />
                   </div>
                 )}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center shadow-lg">
+                      <Play className="h-5 w-5 text-white ml-0.5" />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <CardContent className="p-4">
-                <h3 className="font-medium truncate">{playlist.name}</h3>
-                <p className="text-sm text-muted-foreground">{playlist.tracks.length} 首歌曲</p>
+              <CardContent className="p-3">
+                <h3 className="font-semibold text-sm truncate">{playlist.name}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">{playlist.description}</p>
               </CardContent>
             </Card>
           ))}
         </div>
       </section>
 
-      {/* New Releases */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold">最新发布</h2>
-          <Button variant="ghost" size="sm">查看全部</Button>
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-2xl font-bold tracking-tight">最新发布</h2>
+          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            查看全部
+          </Button>
         </div>
-        
-        <div className="grid grid-cols-1 gap-2">
+        <div className="space-y-1">
           {mockTracks.slice(0, 5).map((track, index) => (
             <div
               key={track.id}
-              className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+              className={`musai-press flex items-center gap-4 p-3 rounded-xl transition-colors cursor-pointer group ${playingId === track.id
+                  ? 'bg-primary/10'
+                  : 'hover:bg-muted/60'
+                }`}
               onClick={() => handleTrackSelect(track)}
             >
-              <span className="text-muted-foreground w-6 text-center">{index + 1}</span>
-              <div className="h-12 w-12 rounded bg-muted flex items-center justify-center">
-                {track.cover ? (
-                  <img src={track.cover} alt={track.title} className="h-full w-full rounded object-cover" />
+              <span className={`w-6 text-center text-sm font-medium ${playingId === track.id ? 'text-primary' : 'text-muted-foreground'
+                }`}>
+                {playingId === track.id ? (
+                  <div className="flex items-end justify-center gap-[3px] h-4">
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                  </div>
                 ) : (
-                  <span className="text-lg">🎵</span>
+                  index + 1
+                )}
+              </span>
+              <div className="musai-cover h-12 w-12 flex-shrink-0">
+                {track.cover ? (
+                  <img src={track.cover} alt={track.title} className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <Music className="h-5 w-5 text-muted-foreground" />
+                  </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{track.title}</p>
-                <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+                <p className={`font-medium truncate text-sm ${playingId === track.id ? 'text-primary' : ''}`}>
+                  {track.title}
+                </p>
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{track.artist}</p>
               </div>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs text-muted-foreground tabular-nums">
                 {track.duration !== undefined
                   ? `${Math.floor(track.duration / 60)}:${(track.duration % 60).toString().padStart(2, '0')}`
                   : '--:--'}

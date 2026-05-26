@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useAuthStore } from '@/stores/authStore'
+import { Music, Sparkles } from 'lucide-react'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
@@ -25,20 +26,28 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 via-background to-primary/5 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/60">
-            <span className="text-3xl font-bold text-primary-foreground">D</span>
+    <div className="relative flex min-h-screen items-center justify-center px-4 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-primary/10" />
+      <div className="absolute top-1/4 -left-32 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
+      <div className="absolute bottom-1/4 -right-32 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
+
+      <Card className="relative w-full max-w-md border-0 shadow-2xl shadow-primary/5 animate-musai-scale-in">
+        <CardHeader className="text-center pb-2">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/25 animate-musai-pulse-glow">
+            <Music className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl">欢迎回来</CardTitle>
-          <CardDescription>登录您的 D-Music 账户</CardDescription>
+          <CardTitle className="text-2xl font-bold">
+            <span className="musai-gradient-text">MusAI</span>
+          </CardTitle>
+          <CardDescription className="text-base mt-1">
+            缪斯智音 · 登录您的账户
+          </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+              <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive animate-musai-fade-in">
                 {error}
               </div>
             )}
@@ -55,6 +64,7 @@ function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
+                className="h-11 rounded-xl transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -70,20 +80,28 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={isLoading}
+                className="h-11 rounded-xl transition-all focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 rounded-xl text-base font-medium musai-press bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/20 transition-all"
               disabled={isLoading}
             >
-              {isLoading ? '登录中...' : '登录'}
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 animate-spin" />
+                  登录中...
+                </span>
+              ) : (
+                '登录'
+              )}
             </Button>
 
-            <p className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground pt-2">
               还没有账户？{' '}
-              <Link to="/register" className="font-medium text-primary hover:underline">
+              <Link to="/register" className="font-semibold text-primary hover:underline underline-offset-4 transition-all">
                 立即注册
               </Link>
             </p>

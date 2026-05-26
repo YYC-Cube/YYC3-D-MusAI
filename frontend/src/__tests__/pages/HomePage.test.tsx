@@ -33,7 +33,7 @@ describe('HomePage', () => {
     render(<HomePage />)
 
     expect(screen.getByText('发现音乐')).toBeInTheDocument()
-    expect(screen.getByText('探索无限可能，让音乐点亮生活')).toBeInTheDocument()
+    expect(screen.getByText(/探索无限可能/)).toBeInTheDocument()
   })
 
   it('should render quick action cards', () => {
