@@ -17,4 +17,6 @@ uploads/
 lighthouse-reports/
 frontend/coverage/
 backend/coverage/
-data/
+/data/
+playwright-report/
+frontend/playwright-report/
