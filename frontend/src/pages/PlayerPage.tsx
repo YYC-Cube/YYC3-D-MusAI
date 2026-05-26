@@ -1,21 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { usePlayerStore } from '@/stores/playerStore'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
+import { usePlayerStore } from '@/stores/playerStore'
 import {
-  Play,
+  ChevronDown,
+  Heart,
+  ListMusic,
+  Music,
   Pause,
+  Play,
+  Repeat,
+  Shuffle,
   SkipBack,
   SkipForward,
   Volume2,
   VolumeX,
-  Repeat,
-  Shuffle,
-  ListMusic,
-  Heart,
-  ChevronDown,
 } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function PlayerPage() {
   const navigate = useNavigate()
@@ -34,6 +35,7 @@ function PlayerPage() {
   const [repeatMode, setRepeatMode] = useState<'none' | 'all' | 'one'>('none')
   const [showQueue, setShowQueue] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
+  const [likeAnim, setLikeAnim] = useState(false)
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -57,7 +59,7 @@ function PlayerPage() {
         clearInterval(progressInterval.current)
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, duration])
 
   const handleNext = () => {
@@ -86,6 +88,12 @@ function PlayerPage() {
     actions.setVolume(value[0] / 100)
   }
 
+  const handleLike = () => {
+    setIsLiked(!isLiked)
+    setLikeAnim(true)
+    setTimeout(() => setLikeAnim(false), 300)
+  }
+
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60)
     const secs = Math.floor(seconds % 60)
@@ -99,57 +107,57 @@ function PlayerPage() {
 
   if (!currentTrack) {
     return (
-      <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground">
-        <ListMusic className="h-16 w-16 opacity-50" />
+      <div className="flex flex-col items-center justify-center h-full gap-4 text-muted-foreground animate-musai-fade-in">
+        <Music className="h-16 w-16 opacity-50" />
         <p className="text-lg">暂无正在播放的歌曲</p>
-        <Button onClick={() => navigate('/discover')}>去发现音乐</Button>
+        <Button onClick={() => navigate('/discover')} className="rounded-xl musai-press">
+          去发现音乐
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full max-w-2xl mx-auto">
-      {/* Header */}
+    <div className="flex flex-col h-full max-w-2xl mx-auto animate-musai-fade-in">
       <div className="flex items-center justify-between mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="musai-press rounded-full">
           <ChevronDown className="h-6 w-6" />
         </Button>
         <div className="text-center">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">正在播放</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium">正在播放</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setIsLiked(!isLiked)}>
-          <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+        <Button variant="ghost" size="icon" onClick={handleLike} className="musai-press rounded-full">
+          <Heart className={`h-6 w-6 transition-colors ${isLiked ? 'fill-rose-500 text-rose-500' : ''} ${likeAnim ? 'animate-musai-heart-pop' : ''}`} />
         </Button>
       </div>
 
-      {/* Cover Art */}
       <div className="flex-1 flex items-center justify-center mb-8">
-        <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-2xl overflow-hidden shadow-2xl">
-          {currentTrack.cover ? (
-            <img
-              src={currentTrack.cover}
-              alt={currentTrack.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <ListMusic className="h-24 w-24 text-muted-foreground" />
-            </div>
-          )}
+        <div className={`relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl ${isPlaying ? 'animate-musai-spin-slow' : ''} ${isPlaying ? 'animate-musai-pulse-glow' : ''}`}>
+          <div className="musai-cover w-full h-full !rounded-full">
+            {currentTrack.cover ? (
+              <img
+                src={currentTrack.cover}
+                alt={currentTrack.title}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-primary/20 to-muted flex items-center justify-center">
+                <Music className="h-24 w-24 text-muted-foreground/50" />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Track Info */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold truncate">{currentTrack.title}</h1>
-        <p className="text-lg text-muted-foreground mt-1">{currentTrack.artist}</p>
+        <p className="text-base text-muted-foreground mt-1">{currentTrack.artist}</p>
         {currentTrack.album && (
-          <p className="text-sm text-muted-foreground mt-0.5">{currentTrack.album}</p>
+          <p className="text-sm text-muted-foreground/70 mt-0.5">{currentTrack.album}</p>
         )}
       </div>
 
-      {/* Progress */}
-      <div className="mb-6">
+      <div className="mb-6 px-2">
         <Slider
           value={[progress]}
           max={duration || 100}
@@ -157,31 +165,30 @@ function PlayerPage() {
           onValueChange={handleProgressChange}
           className="mb-2"
         />
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-xs text-muted-foreground tabular-nums">
           <span>{formatTime(progress)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex items-center justify-center gap-6 mb-6">
+      <div className="flex items-center justify-center gap-5 mb-6">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setIsShuffle(!isShuffle)}
-          className={isShuffle ? 'text-primary' : ''}
+          className={`musai-press rounded-full ${isShuffle ? 'text-primary bg-primary/10' : ''}`}
         >
           <Shuffle className="h-5 w-5" />
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={handlePrevious}>
+        <Button variant="ghost" size="icon" onClick={handlePrevious} className="musai-press rounded-full">
           <SkipBack className="h-7 w-7" />
         </Button>
 
         <Button
           size="icon"
           onClick={() => actions.togglePlay()}
-          className="rounded-full h-16 w-16"
+          className="rounded-full h-16 w-16 musai-press bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/30 hover:shadow-primary/40 transition-shadow"
         >
           {isPlaying ? (
             <Pause className="h-8 w-8" />
@@ -190,7 +197,7 @@ function PlayerPage() {
           )}
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={handleNext}>
+        <Button variant="ghost" size="icon" onClick={handleNext} className="musai-press rounded-full">
           <SkipForward className="h-7 w-7" />
         </Button>
 
@@ -198,17 +205,18 @@ function PlayerPage() {
           variant="ghost"
           size="icon"
           onClick={() => setRepeatMode(repeatMode === 'none' ? 'all' : repeatMode === 'all' ? 'one' : 'none')}
+          className={`musai-press rounded-full ${repeatMode !== 'none' ? 'text-primary bg-primary/10' : ''}`}
         >
           {getRepeatIcon()}
         </Button>
       </div>
 
-      {/* Volume & Queue */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 px-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => actions.setVolume(volume === 0 ? 0.8 : 0)}
+          className="musai-press rounded-full"
         >
           {volume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
         </Button>
@@ -223,23 +231,21 @@ function PlayerPage() {
           variant="ghost"
           size="icon"
           onClick={() => setShowQueue(!showQueue)}
-          className={showQueue ? 'text-primary' : ''}
+          className={`musai-press rounded-full ${showQueue ? 'text-primary bg-primary/10' : ''}`}
         >
           <ListMusic className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Queue Panel */}
       {showQueue && (
-        <div className="mt-4 border rounded-lg p-4 max-h-48 overflow-y-auto">
-          <h3 className="text-sm font-medium mb-2">播放队列 ({queue.length})</h3>
+        <div className="mt-4 border rounded-xl p-4 max-h-48 overflow-y-auto animate-musai-fade-in">
+          <h3 className="text-sm font-semibold mb-3">播放队列 ({queue.length})</h3>
           <div className="space-y-1">
             {queue.map((track, index) => (
               <div
                 key={track.id}
-                className={`flex items-center gap-2 p-2 rounded cursor-pointer text-sm ${
-                  index === currentIndex ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                }`}
+                className={`musai-press flex items-center gap-3 p-2 rounded-lg cursor-pointer text-sm transition-colors ${index === currentIndex ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
+                  }`}
                 onClick={() => actions.play(track)}
               >
                 <span className="w-5 text-xs text-muted-foreground">{index + 1}</span>
@@ -248,10 +254,11 @@ function PlayerPage() {
                   <p className="truncate text-xs text-muted-foreground">{track.artist}</p>
                 </div>
                 {index === currentIndex && isPlaying && (
-                  <div className="flex gap-0.5">
-                    <div className="w-1 h-3 bg-primary animate-pulse" />
-                    <div className="w-1 h-4 bg-primary animate-pulse delay-75" />
-                    <div className="w-1 h-2 bg-primary animate-pulse delay-150" />
+                  <div className="flex items-end gap-[2px] h-4">
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
+                    <div className="musai-eq-bar w-[3px] bg-primary rounded-full" />
                   </div>
                 )}
               </div>

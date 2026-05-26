@@ -33,7 +33,7 @@ describe('LoginPage', () => {
     renderWithRouter(<LoginPage />)
 
     // 检查关键元素存在
-    expect(screen.getByText('欢迎回来')).toBeInTheDocument()
+    expect(screen.getByText(/MusAI/)).toBeInTheDocument()
     expect(screen.getByLabelText(/邮箱地址/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/密码/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /登录/i })).toBeInTheDocument()
