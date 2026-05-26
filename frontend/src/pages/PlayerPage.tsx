@@ -15,7 +15,7 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function PlayerPage() {
@@ -36,31 +36,6 @@ function PlayerPage() {
   const [showQueue, setShowQueue] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
   const [likeAnim, setLikeAnim] = useState(false)
-  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    if (isPlaying && duration > 0) {
-      progressInterval.current = setInterval(() => {
-        const { progress, duration, isPlaying } = usePlayerStore.getState()
-        if (!isPlaying) return
-        if (progress >= duration) {
-          handleNext()
-        } else {
-          actions.setProgress(progress + 1)
-        }
-      }, 1000)
-    } else {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current)
-      }
-    }
-    return () => {
-      if (progressInterval.current) {
-        clearInterval(progressInterval.current)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPlaying, duration])
 
   const handleNext = () => {
     if (isShuffle) {
