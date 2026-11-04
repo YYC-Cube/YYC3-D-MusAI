@@ -18,10 +18,11 @@ import songRoutes from './routes/songRoutes'
 // 创建Express应用
 const app: Express = express()
 
-// 中间件配置
+// 中间件配置（FRONTEND_URL 支持逗号分隔多 origin）
+const allowedOrigins = FRONTEND_URL.split(',').map((s) => s.trim()).filter(Boolean)
 app.use(helmet())
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: allowedOrigins,
   credentials: true,
 }))
 app.use(cookieParser())
@@ -90,7 +91,7 @@ async function startServer() {
     const httpServer = createServer(app)
     const io = new SocketIOServer(httpServer, {
       cors: {
-        origin: FRONTEND_URL,
+        origin: allowedOrigins,
         credentials: true,
       },
       pingTimeout: 60000,
