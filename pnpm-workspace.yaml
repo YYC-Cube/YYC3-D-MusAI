@@ -15,3 +15,6 @@ overrides:
   proxy-addr: ^2.0.8
   handlebars: ^4.7.10
   shell-quote: ^1.12.0
+
+patchedDependencies:
+  write-file-atomic@4.0.2: patches/write-file-atomic@4.0.2.patch

@@ -1,0 +1,13 @@
+diff --git a/lib/index.js b/lib/index.js
+index 9d79d797a553fe58875787cc20c9fa687268f67e..14da248b8bcab258fa48accc26650780e42c1cb1 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -100,7 +100,7 @@ async function writeFileAsync (filename, data, options = {}) {
+           options.mode = stats.mode
+         }
+ 
+-        if (options.chown == null && process.getuid) {
++        if (options.chown == null && process.getuid && stats.uid != null) {
+           options.chown = { uid: stats.uid, gid: stats.gid }
+         }
+       }
