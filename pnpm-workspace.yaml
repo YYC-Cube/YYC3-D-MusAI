@@ -4,11 +4,11 @@ packages:
   - mobile-app
   - shared
 
-onlyBuiltDependencies:
-  - esbuild
-  - detox
-  - dtrace-provider
-  - msw
+allowBuilds:
+  detox: true
+  dtrace-provider: true
+  esbuild: true
+  msw: true
 
 overrides:
   proxy-addr: ^2.0.8
