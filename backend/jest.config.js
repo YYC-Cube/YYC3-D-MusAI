@@ -7,7 +7,7 @@ module.exports = {
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', { diagnostics: { ignoreCodes: [2353, 2339, 2345] } }],
+    '^.+\\.ts$': ['ts-jest', { diagnostics: { ignoreCodes: [2353, 2339, 2345] }, sourcemap: false }],
   },
   setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
   collectCoverageFrom: [
