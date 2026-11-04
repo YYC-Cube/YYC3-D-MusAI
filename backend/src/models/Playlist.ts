@@ -1,6 +1,6 @@
+import { randomUUID } from 'crypto'
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
-import { v4 as uuidv4 } from 'uuid'
 
 interface PlaylistAttributes {
   id: string
@@ -28,7 +28,7 @@ Playlist.init(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: () => uuidv4(),
+      defaultValue: () => randomUUID(),
       primaryKey: true,
     },
     name: {

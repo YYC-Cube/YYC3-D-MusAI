@@ -3,11 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import HomePage from '@/pages/HomePage'
 
 const mockPlay = vi.fn()
+const mockSetQueue = vi.fn()
 
 vi.mock('@/stores/playerStore', () => ({
   usePlayerStore: () => ({
     actions: {
       play: mockPlay,
+      setQueue: mockSetQueue,
     },
   }),
 }))
@@ -51,11 +53,13 @@ describe('HomePage', () => {
 
   it('should call play action when track is selected', () => {
     mockPlay.mockClear()
+    mockSetQueue.mockClear()
     render(<HomePage />)
 
     const trackButton = screen.getByTestId('track-1')
     fireEvent.click(trackButton)
 
+    expect(mockSetQueue).toHaveBeenCalled()
     expect(mockPlay).toHaveBeenCalled()
   })
 })

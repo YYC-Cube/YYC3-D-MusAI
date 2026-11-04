@@ -1,7 +1,8 @@
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'crypto'
+import type { RequestHandler } from 'express'
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads'
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '10485760', 10) // 默认10MB
@@ -38,7 +39,7 @@ const storage = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`
+    const uniqueName = `${randomUUID()}${path.extname(file.originalname)}`
     cb(null, uniqueName)
   },
 })
@@ -78,13 +79,13 @@ export const upload = multer({
 })
 
 // 音频文件上传中间件
-export const uploadAudio = upload.fields([
+export const uploadAudio: RequestHandler = upload.fields([
   { name: 'audio', maxCount: 1 },
   { name: 'cover', maxCount: 1 },
 ])
 
 // 头像上传中间件
-export const uploadAvatar = upload.single('avatar')
+export const uploadAvatar: RequestHandler = upload.single('avatar')
 
 // 错误处理中间件
 export function handleUploadError(err: Error, _req: Express.Request, res: any, _next: any) {

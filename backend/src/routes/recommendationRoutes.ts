@@ -5,7 +5,7 @@ import {
   getAvailableStrategies,
 } from '../controllers/recommendationController'
 
-const router = Router()
+const router: Router = Router()
 
 // 所有推荐接口都需要认证
 router.use(authMiddleware)

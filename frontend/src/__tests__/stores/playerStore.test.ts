@@ -2,18 +2,13 @@ import { usePlayerStore } from '@/stores/playerStore'
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('howler', () => ({
-  Howl: vi.fn().mockImplementation(() => ({
-    play: vi.fn(),
-    pause: vi.fn(),
-    stop: vi.fn(),
-    unload: vi.fn(),
-    seek: vi.fn(() => 0),
-    duration: vi.fn(() => 180),
-    volume: vi.fn(),
-    playing: vi.fn(() => false),
-  })),
-}))
+// playerStore 使用原生 HTMLAudioElement（Howler 已移除）；
+// jsdom 未实现媒体播放，需在原型上 stub 并手动派发事件驱动状态迁移。
+let audioInstance: HTMLAudioElement | null = null
+
+function fireAudioEvent(event: string) {
+  audioInstance?.dispatchEvent(new Event(event))
+}
 
 const mockTrack = {
   id: 'track-1',
@@ -34,6 +29,7 @@ const mockTrack2 = {
 
 describe('usePlayerStore', () => {
   beforeEach(() => {
+    audioInstance = null
     usePlayerStore.setState({
       currentTrack: null,
       isPlaying: false,
@@ -43,6 +39,13 @@ describe('usePlayerStore', () => {
       queue: [],
       currentIndex: -1,
     })
+
+    window.HTMLMediaElement.prototype.play = vi.fn(function (this: HTMLAudioElement) {
+      audioInstance = this
+      return Promise.resolve()
+    })
+    window.HTMLMediaElement.prototype.pause = vi.fn()
+    window.HTMLMediaElement.prototype.load = vi.fn()
   })
 
   it('should initialize with default state', () => {
@@ -62,6 +65,7 @@ describe('usePlayerStore', () => {
 
     act(() => {
       result.current.actions.play(mockTrack)
+      fireAudioEvent('play')
     })
 
     expect(result.current.currentTrack).toEqual(mockTrack)
@@ -75,6 +79,7 @@ describe('usePlayerStore', () => {
 
     act(() => {
       result.current.actions.play(mockTrack)
+      fireAudioEvent('play')
       result.current.actions.pause()
     })
 
@@ -253,6 +258,7 @@ describe('usePlayerStore', () => {
 
     expect(result.current.currentTrack).toEqual(noAudioTrack)
     expect(result.current.isPlaying).toBe(false)
+    expect(window.HTMLMediaElement.prototype.play).not.toHaveBeenCalled()
   })
 
   it('should toggle play state', () => {
@@ -260,6 +266,7 @@ describe('usePlayerStore', () => {
 
     act(() => {
       result.current.actions.play(mockTrack)
+      fireAudioEvent('play')
     })
     expect(result.current.isPlaying).toBe(true)
 

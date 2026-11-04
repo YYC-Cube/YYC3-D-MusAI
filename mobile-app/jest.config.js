@@ -1,9 +1,6 @@
 module.exports = {
-  preset: 'react-native',
+  preset: 'jest-expo',
   testEnvironment: 'node',
-  transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
-  },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/__tests__/**/*.(ts|tsx|js)', '**/*.(test|spec).(ts|tsx|js)'],
   moduleNameMapper: {
@@ -19,9 +16,9 @@ module.exports = {
     '@/services/userService': '<rootDir>/__mocks__/@/services/userService.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|expo|@expo|react-native-vector-icons|expo-local-authentication|expo-modules-core|@react-native-async-storage)/)',
+    '/node_modules/(?!.*(react-native|@react-native|@react-navigation|expo|@expo|jest-expo))',
   ],
-  setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
+  setupFilesAfterEnv: [],
   testPathIgnorePatterns: [
     '/node_modules/',
     '/e2e/',

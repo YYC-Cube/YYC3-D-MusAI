@@ -36,7 +36,7 @@ describe('LoginPage', () => {
     expect(screen.getByText(/MusAI/)).toBeInTheDocument()
     expect(screen.getByLabelText(/邮箱地址/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/密码/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /登录/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '登录' })).toBeInTheDocument()
   })
 
   it('shows email and password input fields', () => {
@@ -87,7 +87,7 @@ describe('LoginPage', () => {
     await user.type(screen.getByPlaceholderText('••••••••'), 'password123')
 
     // 提交表单
-    await user.click(screen.getByRole('button', { name: /登录/i }))
+    await user.click(screen.getByRole('button', { name: '登录' }))
 
     await waitFor(() => {
       expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'password123')
@@ -112,7 +112,7 @@ describe('LoginPage', () => {
     await user.type(screen.getByPlaceholderText('your@email.com'), 'wrong@email.com')
     await user.type(screen.getByPlaceholderText('••••••••'), 'wrongpass')
 
-    await user.click(screen.getByRole('button', { name: /登录/i }))
+    await user.click(screen.getByRole('button', { name: '登录' }))
 
     await waitFor(() => {
       expect(screen.getByText(/Invalid credentials|登录失败/i)).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe('LoginPage', () => {
     renderWithRouter(<LoginPage />)
 
     // 不填写任何内容直接提交
-    await user.click(screen.getByRole('button', { name: /登录/i }))
+    await user.click(screen.getByRole('button', { name: '登录' }))
 
     // HTML5验证会阻止提交（required属性）
     expect(mockLogin).not.toHaveBeenCalled()

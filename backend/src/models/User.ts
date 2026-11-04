@@ -1,7 +1,7 @@
+import { randomUUID } from 'crypto'
 import { DataTypes, Model, Optional } from 'sequelize'
 import sequelize from '../config/database'
 import bcrypt from 'bcryptjs'
-import { v4 as uuidv4 } from 'uuid'
 
 interface UserAttributes {
   id: string
@@ -39,7 +39,7 @@ User.init(
   {
     id: {
       type: DataTypes.UUID,
-      defaultValue: () => uuidv4(),
+      defaultValue: () => randomUUID(),
       primaryKey: true,
     },
     email: {

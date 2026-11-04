@@ -4,7 +4,7 @@ import { authMiddleware, optionalAuthMiddleware } from '../middleware/auth'
 import { uploadAudio, handleUploadError } from '../services/uploadService'
 import { cacheMiddleware } from '../utils/redis'
 
-const router = Router()
+const router: Router = Router()
 
 // 公开路由 - 带缓存
 router.get('/', optionalAuthMiddleware, cacheMiddleware(300), songController.getAllSongs)

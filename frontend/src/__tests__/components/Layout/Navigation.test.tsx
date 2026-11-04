@@ -57,7 +57,7 @@ describe('Navigation', () => {
       </MemoryRouter>
     )
 
-    expect(screen.getByText(/登录/i)).toBeInTheDocument()
+    expect(screen.getByText('LOGIN')).toBeInTheDocument()
   })
 
   it('should call logout when logout button clicked', () => {
@@ -74,7 +74,7 @@ describe('Navigation', () => {
       </MemoryRouter>
     )
 
-    const logoutButton = screen.getByTitle(/退出登录/i)
+    const logoutButton = screen.getByTitle('EXIT')
     fireEvent.click(logoutButton)
 
     expect(mockLogout).toHaveBeenCalled()

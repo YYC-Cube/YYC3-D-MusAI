@@ -12,6 +12,7 @@ import logger from './utils/logger'
 
 // 导入路由
 import authRoutes from './routes/authRoutes'
+import recommendationRoutes from './routes/recommendationRoutes'
 import songRoutes from './routes/songRoutes'
 
 // 创建Express应用
@@ -40,6 +41,7 @@ app.use('/api', limiter)
 
 // API路由
 app.use('/api/auth', authRoutes)
+app.use('/api/recommendations', recommendationRoutes)
 app.use('/api/songs', songRoutes)
 
 // 健康检查

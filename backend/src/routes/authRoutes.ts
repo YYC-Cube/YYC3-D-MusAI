@@ -2,7 +2,7 @@ import { Router } from 'express'
 import * as authController from '../controllers/authController'
 import { authMiddleware } from '../middleware/auth'
 
-const router = Router()
+const router: Router = Router()
 
 // 公开路由
 router.post('/register', authController.register)

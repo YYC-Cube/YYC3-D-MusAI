@@ -21,3 +21,9 @@ backend/coverage/
 /data/
 playwright-report/
 frontend/playwright-report/
+
+# AI 工具状态目录
+.mimosa/
+.v2c/
+.video_agent/
+__pycache__/

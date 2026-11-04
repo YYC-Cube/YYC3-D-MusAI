@@ -28,6 +28,7 @@ describe('authController', () => {
     mockRes = {
       status: statusMock,
       json: jsonMock,
+      cookie: jest.fn(),
     }
     jest.clearAllMocks()
   })
