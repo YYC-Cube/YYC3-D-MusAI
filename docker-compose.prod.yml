@@ -1,0 +1,142 @@
+# MusAI 生产部署编排（目标宿主：yyc3-45 NAS）
+# 与既有 19 容器共存：端口绑定 LAN(192.168.3.45) + Tailscale(100.65.172.88) + 回环，不暴露公网面
+# MySQL/Redis 不映射宿主端口，仅 musai_internal 网络可达（数据面与 MariaDB/PG/Redis 既有实例隔离）
+# 凭证经 .env.prod 注入（不入库，chmod 600）
+name: musai
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: musai-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: d_music_99
+      MYSQL_USER: musai_app
+      MYSQL_PASSWORD: ${MYSQL_APP_PASSWORD}
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --max-connections=120
+      --innodb-buffer-pool-size=256M
+    volumes:
+      - musai_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    networks:
+      - musai_internal
+
+  redis:
+    image: redis:7-alpine
+    container_name: musai-redis
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    command: >
+      redis-server
+      --appendonly yes
+      --appendfsync everysec
+      --maxmemory 128mb
+      --maxmemory-policy allkeys-lru
+      --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - musai_redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - musai_internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: musai-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 25101
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: d_music_99
+      DB_USER: musai_app
+      DB_PASSWORD: ${MYSQL_APP_PASSWORD}
+      DB_POOL_MAX: 10
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      FRONTEND_URL: ${FRONTEND_URL}
+      UPLOAD_DIR: /app/uploads
+      MAX_FILE_SIZE: 10485760
+    ports:
+      - "127.0.0.1:25101:25101"
+      - "192.168.3.45:25101:25101"
+      - "100.65.172.88:25101:25101"
+    volumes:
+      - musai_uploads:/app/uploads
+      - musai_logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:25101/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - musai_internal
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_SOCKET_URL: ${VITE_SOCKET_URL}
+    container_name: musai-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:20101:80"
+      - "192.168.3.45:20101:80"
+      - "100.65.172.88:20101:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - musai_internal
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+
+volumes:
+  musai_mysql_data:
+    driver: local
+  musai_redis_data:
+    driver: local
+  musai_uploads:
+    driver: local
+  musai_logs:
+    driver: local
+
+networks:
+  musai_internal:
+    driver: bridge

@@ -5,11 +5,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY pnpm-lock.yaml* ./
 
-# Install dependencies
-RUN corepack enable && \
-    pnpm install --frozen-lockfile || npm install
+# Install dependencies (npm ci: strictly per lockfile; legacy-peer-deps for vitest peer ranges)
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .

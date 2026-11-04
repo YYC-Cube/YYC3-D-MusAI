@@ -23,6 +23,7 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL',
+        name: 'songs_album_id_foreign_idx',
       },
       duration: {
         type: Sequelize.INTEGER,
@@ -66,6 +67,7 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
+        name: 'songs_uploaded_by_foreign_idx',
       },
       is_public: {
         type: Sequelize.BOOLEAN,
