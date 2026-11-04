@@ -79,7 +79,9 @@ jobs:
       - name: Backend Tests (jest)
         if: matrix.project == 'backend'
         working-directory: backend
-        run: npx jest --no-cache --runInBand --cacheDirectory=$GITHUB_WORKSPACE/.jest-cache-backend
+        run: |
+          node -e "console.log('getuid:', typeof process.getuid, process.getuid?.())"
+          npx jest --no-cache --runInBand --cacheDirectory=$GITHUB_WORKSPACE/.jest-cache-backend
         env:
           JWT_SECRET: test_jwt_secret_key_minimum_32_characters_long_for_ci
           NODE_ENV: test
