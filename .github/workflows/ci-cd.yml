@@ -79,7 +79,7 @@ jobs:
       - name: Backend Tests (jest)
         if: matrix.project == 'backend'
         working-directory: backend
-        run: npx jest --cacheDirectory=/tmp/jest-cache-${{ github.run_id }}-${{ github.run_attempt }}
+        run: npx jest --no-cache
         env:
           JWT_SECRET: test_jwt_secret_key_minimum_32_characters_long_for_ci
           NODE_ENV: test
