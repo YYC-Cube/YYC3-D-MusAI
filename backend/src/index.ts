@@ -98,8 +98,8 @@ async function startServer() {
       pingInterval: 25000,
     })
 
-    // 初始化聊天服务
-    const chatService = new ChatService(io)
+    // 初始化聊天服务（构造时注册 Socket.IO 事件监听）
+    new ChatService(io)
 
     httpServer.listen(PORT, () => {
       logger.info('🚀 D-Music 后端服务启动成功', {

@@ -37,6 +37,11 @@ import PlaybackSettingsScreen from '@/screens/settings/PlaybackSettingsScreen'
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator()
 
+// monorepo 内 @types/react 双版本共存（frontend 18 / mobile 19），navigation 的
+// ScreenComponentType 与无注解的 screen 函数组件跨包类型域比较会误报 TS2322；
+// 统一经此归一（运行时恒等，无影响）。
+const asScreen = (component: unknown): any => component
+
 function MainTabNavigator() {
   return (
     <Tab.Navigator
@@ -115,29 +120,29 @@ export default function AppNavigator() {
           {/* Discover Stack Screens */}
           <Stack.Screen
             name="SearchResults"
-            component={SearchResultsScreen}
+            component={asScreen(SearchResultsScreen)}
             options={{ presentation: 'card' }}
           />
           <Stack.Screen
             name="ArtistDetail"
-            component={ArtistDetailScreen}
+            component={asScreen(ArtistDetailScreen)}
             options={{ presentation: 'card' }}
           />
           <Stack.Screen
             name="AlbumDetail"
-            component={AlbumDetailScreen}
+            component={asScreen(AlbumDetailScreen)}
             options={{ presentation: 'card' }}
           />
 
           {/* Library Stack Screens */}
           <Stack.Screen
             name="PlaylistDetail"
-            component={PlaylistDetailScreen}
+            component={asScreen(PlaylistDetailScreen)}
             options={{ presentation: 'card' }}
           />
           <Stack.Screen
             name="Downloads"
-            component={DownloadsScreen}
+            component={asScreen(DownloadsScreen)}
             options={{ presentation: 'modal' }}
           />
 
@@ -156,17 +161,17 @@ export default function AppNavigator() {
           />
           <Stack.Screen
             name="Notifications"
-            component={NotificationsScreen}
+            component={asScreen(NotificationsScreen)}
             options={{ presentation: 'card' }}
           />
           <Stack.Screen
             name="AccountSecurity"
-            component={AccountSecurityScreen}
+            component={asScreen(AccountSecurityScreen)}
             options={{ presentation: 'modal' }}
           />
           <Stack.Screen
             name="PlaybackSettings"
-            component={PlaybackSettingsScreen}
+            component={asScreen(PlaybackSettingsScreen)}
             options={{ presentation: 'card' }}
           />
         </>
