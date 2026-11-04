@@ -15,9 +15,7 @@
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
   },
-  "devDependencies": {
-    "pnpm": "^10.34.5"
-  },
+  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=10.0.0"
