@@ -33,8 +33,9 @@ COPY --from=builder /app/src/migrations ./src/migrations
 COPY --from=builder /app/src/config/database.js ./src/config/database.js
 COPY --from=builder /app/.sequelizerc ./.sequelizerc
 
-# Create non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Create non-root user for security; pre-create writable upload dir (named volume inherits ownership)
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup \
+    && mkdir -p /app/uploads && chown -R appuser:appgroup /app/uploads
 USER appuser
 
 # Environment variables (runtime values should be injected via docker-compose or orchestrator)
