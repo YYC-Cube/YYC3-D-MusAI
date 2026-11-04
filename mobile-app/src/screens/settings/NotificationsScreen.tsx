@@ -42,7 +42,7 @@ const NotificationsScreen: React.FC = () => {
   const loadNotifications = async () => {
     try {
       // TODO: 替换为实际API调用
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise<void>(resolve => setTimeout(resolve, 300));
 
       // Mock数据
       const mockNotifications: Notification[] = [

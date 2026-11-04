@@ -79,7 +79,7 @@ const SearchResultsScreen: React.FC = () => {
 
     try {
       // TODO: 替换为实际API调用
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise<void>(resolve => setTimeout(resolve, 500));
 
       // Mock数据
       const mockSongs: Song[] = [

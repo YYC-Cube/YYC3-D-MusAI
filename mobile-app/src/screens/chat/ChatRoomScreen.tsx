@@ -47,7 +47,7 @@ export default function ChatRoomScreen() {
   const [typingUsers, setTypingUsers] = useState<string[]>([])
 
   const flatListRef = useRef<FlatList>(null)
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     initializeChat()

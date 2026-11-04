@@ -67,7 +67,7 @@ const AlbumDetailScreen: React.FC = () => {
   const loadAlbumSongs = async () => {
     try {
       // TODO: 替换为实际API调用
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise<void>(resolve => setTimeout(resolve, 300));
 
       // Mock数据
       const mockSongs: Song[] = [
