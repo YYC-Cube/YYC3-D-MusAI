@@ -168,7 +168,7 @@ overrides:
   shell-quote: ^1.12.0
 
 patchedDependencies:
-  write-file-atomic@4.0.2: 53438d706462f979aa61ca01ec3c9058b02e017f237e410241c523dcd3025efe
+  write-file-atomic@4.0.2: 3d1dc926cf6c49d1e1c1d6ac8490d0017cde1de1cedee9aee34032403e264bee
 
 importers:
 
@@ -9130,7 +9130,7 @@ snapshots:
       micromatch: 4.0.8
       pirates: 4.0.7
       slash: 3.0.0
-      write-file-atomic: 4.0.2(patch_hash=53438d706462f979aa61ca01ec3c9058b02e017f237e410241c523dcd3025efe)
+      write-file-atomic: 4.0.2(patch_hash=3d1dc926cf6c49d1e1c1d6ac8490d0017cde1de1cedee9aee34032403e264bee)
     transitivePeerDependencies:
       - supports-color
 
@@ -15851,7 +15851,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  write-file-atomic@4.0.2(patch_hash=53438d706462f979aa61ca01ec3c9058b02e017f237e410241c523dcd3025efe):
+  write-file-atomic@4.0.2(patch_hash=3d1dc926cf6c49d1e1c1d6ac8490d0017cde1de1cedee9aee34032403e264bee):
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7

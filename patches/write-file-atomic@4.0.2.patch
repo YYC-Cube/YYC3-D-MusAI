@@ -1,5 +1,5 @@
 diff --git a/lib/index.js b/lib/index.js
-index 9d79d797a553fe58875787cc20c9fa687268f67e..14da248b8bcab258fa48accc26650780e42c1cb1 100644
+index 9d79d797a553fe58875787cc20c9fa687268f67e..d6819e1f73e2da9f7b8178ef65b867eaf65781a8 100644
 --- a/lib/index.js
 +++ b/lib/index.js
 @@ -100,7 +100,7 @@ async function writeFileAsync (filename, data, options = {}) {
@@ -11,3 +11,12 @@ index 9d79d797a553fe58875787cc20c9fa687268f67e..14da248b8bcab258fa48accc26650780
            options.chown = { uid: stats.uid, gid: stats.gid }
          }
        }
+@@ -199,7 +199,7 @@ function writeFileSync (filename, data, options) {
+       if (!options.mode) {
+         options.mode = stats.mode
+       }
+-      if (!options.chown && process.getuid) {
++      if (!options.chown && process.getuid && stats.uid != null) {
+         options.chown = { uid: stats.uid, gid: stats.gid }
+       }
+     } catch (ex) {
