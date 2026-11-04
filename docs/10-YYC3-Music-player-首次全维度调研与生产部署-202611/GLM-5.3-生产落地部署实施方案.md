@@ -153,8 +153,10 @@ retention: permanent
 | 2026-11-04 | S3 | yyc3-45 四容器上线：途中修复迁移 FK 顺序 bug、uploads 卷属主、mysql 探针、frontend nginx conf 缺失 | ✅ 全部 healthy，迁移执行成功 |
 | 2026-11-04 | S3-3 | 生产冒烟：注册/登录/JWT/歌曲分页/推荐策略/反向401 | ✅ 全通 |
 | 2026-11-04 | S4 | yyc3-33 traefik 动态路由追加（备份 dynamic.yml.bak-20261104-musai）+ 热加载 | ✅ `https://music.0379.world/musai/api/health` 200 |
-| 2026-11-04 | S6 | push main（rebase 融合 Dependabot PR#5）+ CI 真门禁首跑 | ✅ CI in_progress |
-| 2026-11-04 | 遗留 | 移动端 3 个异步 mock 等待测试；`musai.0379.world` 干净域名待 DNS 添加；d-music.yyc3.top 未承载 | ⬜ 后续会话 |
+| 2026-11-04 | S6 | push main（rebase 融合 Dependabot PR#5）+ CI 真门禁首跑 | ✅ |
+| 2026-11-04 | 终态 | **四容器全部 healthy**（frontend 探针 ::1→127.0.0.1 修复）；公网 health/登录反向 401 全通；NAS 负载 1.69 正常 | ✅ **生产上线达成** |
+| 2026-11-04 | CI 门禁 | 真门禁迭代 6 轮：8 关卡中 5 绿（Security/frontend lint+test/mobile test），3 红为 CI/本地依赖树差异工具链问题（mobile tsc @types/react 域、backend coverage CI 微差、backend tsc 同源） | 🔄 门禁工作正常，3 红精确记录于记忆 |
+| 2026-11-04 | 遗留 | `musai.0379.world` DNS 待添加；mobile RNTL12 迁移与 3 例 FlatList 测试适配；CI 3 红收口；d-music.yyc3.top 域名决策 | ⬜ 后续会话 |
 
 ---
 
