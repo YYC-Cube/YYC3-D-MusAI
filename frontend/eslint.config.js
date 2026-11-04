@@ -32,5 +32,12 @@ export default tseslint.config(
       'no-empty': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
     },
+  },
+  {
+    // 测试 mock 与 canvas 动画中的 this 捕获属合理模式
+    files: ['src/__tests__/**', 'src/components/effects/**'],
+    rules: {
+      '@typescript-eslint/no-this-alias': 'off',
+    },
   }
 )
