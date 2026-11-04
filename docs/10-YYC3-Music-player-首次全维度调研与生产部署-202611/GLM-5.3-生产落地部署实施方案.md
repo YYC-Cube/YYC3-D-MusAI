@@ -149,7 +149,12 @@ retention: permanent
 | 时间 | 阶段 | 动作 | 结果 |
 |---|---|---|---|
 | 2026-11-04 | S0 | 调研报告 + 本方案产出 | ✅ |
-| （执行中实时追加） | | | |
+| 2026-11-04 | S1 | P0×3 修复（构建参数/迁移入口/CI 门禁真化）+ 三端类型/测试/审计修复 | ✅ 后端130/130 前端82/82 移动端26/29 critical=0 |
+| 2026-11-04 | S3 | yyc3-45 四容器上线：途中修复迁移 FK 顺序 bug、uploads 卷属主、mysql 探针、frontend nginx conf 缺失 | ✅ 全部 healthy，迁移执行成功 |
+| 2026-11-04 | S3-3 | 生产冒烟：注册/登录/JWT/歌曲分页/推荐策略/反向401 | ✅ 全通 |
+| 2026-11-04 | S4 | yyc3-33 traefik 动态路由追加（备份 dynamic.yml.bak-20261104-musai）+ 热加载 | ✅ `https://music.0379.world/musai/api/health` 200 |
+| 2026-11-04 | S6 | push main（rebase 融合 Dependabot PR#5）+ CI 真门禁首跑 | ✅ CI in_progress |
+| 2026-11-04 | 遗留 | 移动端 3 个异步 mock 等待测试；`musai.0379.world` 干净域名待 DNS 添加；d-music.yyc3.top 未承载 | ⬜ 后续会话 |
 
 ---
 
