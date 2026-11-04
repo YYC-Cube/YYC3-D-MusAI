@@ -1,6 +1,9 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  // CI 冷环境（Node 20）下 ts-jest getCacheKey 依赖解析的 statSync 链偶发崩溃，
+  // 禁用 transform 缓存绕过（backend 全量编译 ~10s，可接受）
+  cache: false,
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
