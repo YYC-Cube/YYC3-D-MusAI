@@ -3,3 +3,14 @@ packages:
   - backend
   - mobile-app
   - shared
+
+onlyBuiltDependencies:
+  - esbuild
+  - detox
+  - dtrace-provider
+  - msw
+
+overrides:
+  proxy-addr: ^2.0.8
+  handlebars: ^4.7.10
+  shell-quote: ^1.12.0

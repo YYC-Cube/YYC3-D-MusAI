@@ -15,9 +15,9 @@ RUN corepack enable && \
 COPY . .
 
 # Set build arguments
-ARG VITE_API_URL=http://localhost:25101
+ARG VITE_API_BASE_URL=http://localhost:25101/api
 ARG VITE_SOCKET_URL=ws://localhost:25101
-ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 ENV VITE_SOCKET_URL=$VITE_SOCKET_URL
 
 # Build the application

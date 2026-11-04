@@ -28,6 +28,11 @@ RUN npm ci --only=production && npm cache clean --force
 # Copy compiled JavaScript from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy migration assets (sequelize-cli runs plain JS from source tree)
+COPY --from=builder /app/src/migrations ./src/migrations
+COPY --from=builder /app/src/config/database.js ./src/config/database.js
+COPY --from=builder /app/.sequelizerc ./.sequelizerc
+
 # Create non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
@@ -43,5 +48,5 @@ EXPOSE 25101
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:25101/api/health || exit 1
 
-# Start the server
-CMD ["node", "dist/index.js"]
+# Apply database migrations, then start the server
+CMD ["sh", "-c", "npx sequelize-cli db:migrate && node dist/index.js"]
