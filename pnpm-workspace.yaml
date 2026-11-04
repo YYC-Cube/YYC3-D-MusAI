@@ -9,6 +9,7 @@ allowBuilds:
   dtrace-provider: true
   esbuild: true
   msw: true
+  "@swc/core": true
 
 overrides:
   proxy-addr: ^2.0.8

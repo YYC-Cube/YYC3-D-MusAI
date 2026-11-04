@@ -1,13 +1,12 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
-  // CI 冷环境（Node 20）下 ts-jest getCacheKey 依赖解析的 statSync 链偶发崩溃，
-  // 禁用 transform 缓存绕过（backend 全量编译 ~10s，可接受）
-  cache: false,
+  // CI（Node 20 冷环境）下 ts-jest 缓存链存在无法根治的读写崩溃（getCacheKey statSync /
+  // .map 写入失败，--no-cache 亦不生效），换用 @swc/jest：仅转译无诊断，类型检查由
+  // tsc --noEmit 独立把守（CI lint job 已绿）
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', { diagnostics: { ignoreCodes: [2353, 2339, 2345] }, sourcemap: false }],
+    '^.+\\.ts$': '@swc/jest',
   },
   setupFiles: ['<rootDir>/src/__tests__/setup.ts'],
   collectCoverageFrom: [
